@@ -1,0 +1,20 @@
+{
+  "name": "rosetta-sql",
+  "version": "1.0.0",
+  "description": "Natural language to SQL query interface powered by LLM",
+  "main": "backend/main.js",
+  "type": "module",
+  "scripts": {
+    "start": "node backend/main.js",
+    "dev": "node --watch backend/main.js"
+  },
+  "dependencies": {
+    "dotenv": "^16.4.5",
+    "express": "^4.19.2",
+    "express-rate-limit": "^7.3.1",
+    "helmet": "^7.1.0",
+    "morgan": "^1.10.0",
+    "mysql2": "^3.9.7",
+    "openai": "^4.47.1"
+  }
+}

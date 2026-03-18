@@ -1,0 +1,16 @@
+# Dependencies
+node_modules/
+
+# Environment variables — never commit secrets
+.env
+
+# macOS
+.DS_Store
+
+# Python
+__pycache__/
+*.pyc
+
+# Generated files
+backend/public/
+backend/stock_data.csv
