@@ -2,9 +2,9 @@
 
 # Rosetta
 
-**Talk to your MySQL database in plain English.**
+**Talk to your database in plain English.**
 
-Rosetta translates natural language into SQL using GPT-4 Turbo, executes the query against your database, and presents the results as a clean data table — no SQL knowledge required.
+Rosetta translates natural language into SQL using GPT-4 Turbo, executes the query against your database, and presents the results as a clean data table — no SQL knowledge required. Supports MySQL, PostgreSQL, SQL Server, and SQLite.
 
 
 </div>
@@ -15,7 +15,8 @@ Rosetta translates natural language into SQL using GPT-4 Turbo, executes the que
 
 - **Natural language → SQL** — describe what you want in English; GPT-4 Turbo writes the query
 - **Live results table** — query results rendered as a formatted, scrollable table
-- **Schema auto-discovery** — connects to any MySQL database and introspects tables/columns automatically (cached for 5 minutes)
+- **4 database engines** — MySQL, PostgreSQL, SQL Server (MSSQL), and SQLite
+- **Schema auto-discovery** — introspects tables/columns automatically on connect (cached for 5 minutes)
 - **AI chat mode** — switch to free-form GPT-4o chat for general questions
 - **Stock chart visualisation** — plot ASX stock price history directly from your database
 - **Copy SQL** — one-click copy of every generated query
@@ -25,7 +26,8 @@ Rosetta translates natural language into SQL using GPT-4 Turbo, executes the que
 
 | Layer | Technology |
 |---|---|
-| Backend | Node.js · Express · mysql2 (connection pool) |
+| Backend | Node.js · Express · connection pool per engine |
+| Databases | MySQL (mysql2) · PostgreSQL (pg) · SQL Server (mssql) · SQLite (better-sqlite3) |
 | AI | OpenAI API — GPT-4 Turbo (SQL), GPT-4o (chat) |
 | Security | helmet · express-rate-limit · morgan |
 | Visualisation | Python · matplotlib · pandas |
@@ -36,7 +38,7 @@ Rosetta translates natural language into SQL using GPT-4 Turbo, executes the que
 ### Prerequisites
 
 - Node.js 18+
-- MySQL 5.7+ or 8.x
+- At least one of: MySQL 5.7+, PostgreSQL 13+, SQL Server 2017+, or a SQLite file
 - Python 3 with `matplotlib` and `pandas` (only required for stock charts)
 - An OpenAI API key
 

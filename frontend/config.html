@@ -32,11 +32,7 @@
       z-index: 100;
     }
 
-    .nav-brand {
-      font-size: 18px;
-      font-weight: 700;
-      color: #60a5fa;
-    }
+    .nav-brand { font-size: 18px; font-weight: 700; color: #60a5fa; }
 
     .nav-back {
       color: #94a3b8;
@@ -48,7 +44,6 @@
       gap: 6px;
       transition: color 0.2s;
     }
-
     .nav-back:hover { color: #e2e8f0; }
 
     .page {
@@ -65,39 +60,68 @@
       border-radius: 16px;
       padding: 44px 48px;
       width: 100%;
-      max-width: 480px;
+      max-width: 500px;
       box-shadow: 0 24px 64px rgba(0,0,0,0.4);
     }
 
-    .card-header { margin-bottom: 32px; }
+    .card-header { margin-bottom: 28px; }
+    .card-header h1 { font-size: 24px; font-weight: 700; color: #f1f5f9; margin-bottom: 6px; }
+    .card-header p  { font-size: 14px; color: #64748b; }
 
-    .card-header h1 {
-      font-size: 24px;
-      font-weight: 700;
-      color: #f1f5f9;
-      margin-bottom: 6px;
+    /* DB type picker */
+    .db-type-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+      margin-bottom: 24px;
     }
 
-    .card-header p {
-      font-size: 14px;
-      color: #64748b;
-    }
-
-    .field {
-      margin-bottom: 16px;
-    }
-
-    .field label {
-      display: block;
+    .db-type-btn {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 14px;
+      background: rgba(255,255,255,0.04);
+      border: 1px solid rgba(255,255,255,0.09);
+      border-radius: 8px;
+      color: #94a3b8;
       font-size: 13px;
       font-weight: 500;
+      font-family: inherit;
+      cursor: pointer;
+      transition: all 0.15s;
+      text-align: left;
+    }
+
+    .db-type-btn:hover { border-color: rgba(255,255,255,0.2); color: #e2e8f0; }
+
+    .db-type-btn.active {
+      background: rgba(59,130,246,0.12);
+      border-color: rgba(59,130,246,0.5);
+      color: #93c5fd;
+    }
+
+    .db-type-btn .db-icon { font-size: 16px; }
+
+    /* Divider */
+    .divider {
+      border: none;
+      border-top: 1px solid rgba(255,255,255,0.07);
+      margin-bottom: 20px;
+    }
+
+    .field { margin-bottom: 14px; }
+    .field label {
+      display: block;
+      font-size: 12px;
+      font-weight: 500;
       color: #94a3b8;
-      margin-bottom: 6px;
+      margin-bottom: 5px;
     }
 
     .field input {
       width: 100%;
-      padding: 11px 14px;
+      padding: 10px 12px;
       background: rgba(255,255,255,0.06);
       border: 1px solid rgba(255,255,255,0.1);
       border-radius: 8px;
@@ -105,23 +129,18 @@
       font-family: inherit;
       color: #e2e8f0;
       outline: none;
-      transition: border-color 0.2s, background 0.2s;
+      transition: border-color 0.2s;
     }
-
     .field input::placeholder { color: #475569; }
+    .field input:focus { border-color: #3b82f6; background: rgba(59,130,246,0.05); }
 
-    .field input:focus {
-      border-color: #3b82f6;
-      background: rgba(59, 130, 246, 0.05);
-    }
-
-    .row { display: flex; gap: 12px; }
+    .row { display: flex; gap: 10px; }
     .row .field { flex: 1; }
-    .row .field.port { flex: 0 0 110px; }
+    .row .field.port { flex: 0 0 100px; }
 
     .submit-btn {
       width: 100%;
-      margin-top: 24px;
+      margin-top: 20px;
       padding: 13px;
       background: linear-gradient(135deg, #1d4ed8, #3b82f6);
       color: #fff;
@@ -132,51 +151,33 @@
       font-family: inherit;
       cursor: pointer;
       transition: transform 0.15s, box-shadow 0.15s, opacity 0.15s;
-      box-shadow: 0 4px 16px rgba(59, 130, 246, 0.3);
+      box-shadow: 0 4px 16px rgba(59,130,246,0.3);
     }
-
-    .submit-btn:hover:not(:disabled) {
-      transform: translateY(-1px);
-      box-shadow: 0 6px 20px rgba(59, 130, 246, 0.4);
-    }
-
+    .submit-btn:hover:not(:disabled) { transform: translateY(-1px); box-shadow: 0 6px 20px rgba(59,130,246,0.4); }
     .submit-btn:disabled { opacity: 0.6; cursor: not-allowed; }
 
     .status {
-      margin-top: 16px;
-      padding: 12px 14px;
+      margin-top: 14px;
+      padding: 11px 14px;
       border-radius: 8px;
-      font-size: 14px;
+      font-size: 13px;
       display: none;
     }
-
-    .status.error {
-      background: rgba(239, 68, 68, 0.1);
-      border: 1px solid rgba(239, 68, 68, 0.3);
-      color: #fca5a5;
-    }
-
-    .status.success {
-      background: rgba(34, 197, 94, 0.1);
-      border: 1px solid rgba(34, 197, 94, 0.3);
-      color: #86efac;
-    }
+    .status.error   { background: rgba(239,68,68,0.1);  border: 1px solid rgba(239,68,68,0.3);  color: #fca5a5; }
+    .status.success { background: rgba(34,197,94,0.1);  border: 1px solid rgba(34,197,94,0.3);  color: #86efac; }
 
     .spinner {
       display: inline-block;
-      width: 16px;
-      height: 16px;
+      width: 14px; height: 14px;
       border: 2px solid rgba(255,255,255,0.3);
       border-top-color: #fff;
       border-radius: 50%;
       animation: spin 0.7s linear infinite;
       vertical-align: middle;
-      margin-right: 8px;
+      margin-right: 6px;
     }
 
-    @keyframes spin {
-      to { transform: rotate(360deg); }
-    }
+    @keyframes spin { to { transform: rotate(360deg); } }
   </style>
 </head>
 <body>
@@ -189,34 +190,60 @@
     <div class="card">
       <div class="card-header">
         <h1>Connect your database</h1>
-        <p>Enter your MySQL connection details to get started.</p>
+        <p>Select a database type and enter your connection details.</p>
       </div>
 
+      <!-- DB type selector -->
+      <div class="db-type-grid">
+        <button class="db-type-btn active" data-type="mysql">
+          <span class="db-icon">🐬</span> MySQL
+        </button>
+        <button class="db-type-btn" data-type="postgres">
+          <span class="db-icon">🐘</span> PostgreSQL
+        </button>
+        <button class="db-type-btn" data-type="mssql">
+          <span class="db-icon">🪟</span> SQL Server
+        </button>
+        <button class="db-type-btn" data-type="sqlite">
+          <span class="db-icon">📦</span> SQLite
+        </button>
+      </div>
+
+      <hr class="divider">
+
       <form id="configForm" novalidate>
-        <div class="row">
+        <!-- Remote DB fields (hidden for SQLite) -->
+        <div id="remoteFields">
+          <div class="row">
+            <div class="field">
+              <label for="dbHost">Host</label>
+              <input type="text" id="dbHost" placeholder="localhost">
+            </div>
+            <div class="field port">
+              <label for="dbPort">Port</label>
+              <input type="text" id="dbPort" placeholder="3306">
+            </div>
+          </div>
           <div class="field">
-            <label for="dbHost">Host</label>
-            <input type="text" id="dbHost" placeholder="localhost" required>
+            <label for="dbName">Database name</label>
+            <input type="text" id="dbName" placeholder="my_database">
           </div>
-          <div class="field port">
-            <label for="dbPort">Port</label>
-            <input type="text" id="dbPort" placeholder="3306">
+          <div class="field">
+            <label for="dbUser">User</label>
+            <input type="text" id="dbUser" placeholder="root">
+          </div>
+          <div class="field">
+            <label for="dbPassword">Password</label>
+            <input type="password" id="dbPassword" placeholder="••••••••">
           </div>
         </div>
 
-        <div class="field">
-          <label for="dbName">Database name</label>
-          <input type="text" id="dbName" placeholder="my_database" required>
-        </div>
-
-        <div class="field">
-          <label for="dbUser">User</label>
-          <input type="text" id="dbUser" placeholder="root" required>
-        </div>
-
-        <div class="field">
-          <label for="dbPassword">Password</label>
-          <input type="password" id="dbPassword" placeholder="••••••••">
+        <!-- SQLite-only field -->
+        <div id="sqliteFields" style="display:none">
+          <div class="field">
+            <label for="sqliteFile">Database file path</label>
+            <input type="text" id="sqliteFile" placeholder="/path/to/database.db">
+          </div>
         </div>
 
         <button class="submit-btn" type="submit" id="submitBtn">Connect</button>
@@ -227,51 +254,78 @@
   </div>
 
   <script>
-    const form = document.getElementById('configForm');
-    const submitBtn = document.getElementById('submitBtn');
-    const statusEl = document.getElementById('status');
+    const DEFAULT_PORTS = { mysql: '3306', postgres: '5432', mssql: '1433', sqlite: '' };
+    let selectedType = 'mysql';
+
+    // DB type selector
+    document.querySelectorAll('.db-type-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        document.querySelectorAll('.db-type-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        selectedType = btn.dataset.type;
+
+        const isSqlite = selectedType === 'sqlite';
+        document.getElementById('remoteFields').style.display = isSqlite ? 'none' : 'block';
+        document.getElementById('sqliteFields').style.display = isSqlite ? 'block' : 'none';
+
+        if (!isSqlite) {
+          document.getElementById('dbPort').value = DEFAULT_PORTS[selectedType];
+        }
+
+        document.getElementById('status').style.display = 'none';
+      });
+    });
+
+    // Set initial port
+    document.getElementById('dbPort').value = DEFAULT_PORTS['mysql'];
 
     function showStatus(type, message) {
-      statusEl.className = `status ${type}`;
-      statusEl.textContent = message;
-      statusEl.style.display = 'block';
+      const el = document.getElementById('status');
+      el.className = `status ${type}`;
+      el.textContent = message;
+      el.style.display = 'block';
     }
 
     function setLoading(loading) {
-      submitBtn.disabled = loading;
-      submitBtn.innerHTML = loading
-        ? '<span class="spinner"></span>Connecting…'
-        : 'Connect';
+      const btn = document.getElementById('submitBtn');
+      btn.disabled = loading;
+      btn.innerHTML = loading ? '<span class="spinner"></span>Connecting…' : 'Connect';
     }
 
-    form.addEventListener('submit', async (e) => {
+    document.getElementById('configForm').addEventListener('submit', async (e) => {
       e.preventDefault();
-      statusEl.style.display = 'none';
+      document.getElementById('status').style.display = 'none';
 
-      const dbHost = document.getElementById('dbHost').value.trim();
-      const dbPort = document.getElementById('dbPort').value.trim() || '3306';
-      const dbName = document.getElementById('dbName').value.trim();
-      const dbUser = document.getElementById('dbUser').value.trim();
-      const dbPassword = document.getElementById('dbPassword').value;
+      let body = { dbType: selectedType };
 
-      if (!dbHost || !dbName || !dbUser) {
-        showStatus('error', 'Host, database name, and user are required.');
-        return;
+      if (selectedType === 'sqlite') {
+        const file = document.getElementById('sqliteFile').value.trim();
+        if (!file) return showStatus('error', 'File path is required.');
+        body.dbName = file;
+      } else {
+        const dbHost     = document.getElementById('dbHost').value.trim();
+        const dbPort     = document.getElementById('dbPort').value.trim();
+        const dbName     = document.getElementById('dbName').value.trim();
+        const dbUser     = document.getElementById('dbUser').value.trim();
+        const dbPassword = document.getElementById('dbPassword').value;
+        if (!dbHost || !dbName || !dbUser) {
+          return showStatus('error', 'Host, database name, and user are required.');
+        }
+        body = { ...body, dbHost, dbPort, dbName, dbUser, dbPassword };
       }
 
       setLoading(true);
 
       try {
-        const res = await fetch('/configure-db', {
+        const res  = await fetch('/configure-db', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ dbHost, dbPort, dbName, dbUser, dbPassword }),
+          body: JSON.stringify(body),
         });
-
         const data = await res.json();
 
         if (data.success) {
-          showStatus('success', `Connected to "${data.database}" successfully.`);
+          showStatus('success', `Connected to "${data.database}" (${data.type}) successfully.`);
           setTimeout(() => { window.location.href = 'query.html'; }, 900);
         } else {
           showStatus('error', data.error || 'Connection failed.');
