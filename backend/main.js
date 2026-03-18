@@ -465,16 +465,33 @@ app.post('/plot-stock', async (req, res) => {
 // ── General AI chat ───────────────────────────────────────────────────────────
 
 app.post('/gpt-chat', aiLimiter, async (req, res) => {
-  const { userInput } = req.body;
+  const { userInput, messages, dataContext } = req.body;
 
-  if (!userInput?.trim()) {
+  const hasHistory = Array.isArray(messages) && messages.length > 0;
+  if (!hasHistory && !userInput?.trim()) {
     return res.status(400).json({ error: 'Message cannot be empty.' });
   }
 
   try {
+    // Build system message — inject SQL context when available
+    let systemContent = 'You are a helpful data analyst and general assistant. When the user provides SQL query results, analyze them accurately and concisely.';
+
+    if (dataContext?.sql && Array.isArray(dataContext.rows)) {
+      const preview = JSON.stringify(dataContext.rows.slice(0, 100), null, 2);
+      systemContent +=
+        `\n\nThe user just ran this SQL query:\n\`\`\`sql\n${dataContext.sql}\n\`\`\`` +
+        `\n\nQuery results (${dataContext.rows.length} rows):\n\`\`\`json\n${preview}\n\`\`\`` +
+        `\nUse this data when the user asks to analyze, summarize, or discuss the results.`;
+    }
+
+    const openaiMessages = [
+      { role: 'system', content: systemContent },
+      ...(hasHistory ? messages : [{ role: 'user', content: userInput.trim() }]),
+    ];
+
     const completion = await openai.chat.completions.create({
       model: 'gpt-4o',
-      messages: [{ role: 'user', content: userInput.trim() }],
+      messages: openaiMessages,
       max_tokens: 4000,
     });
     res.json({ response: completion.choices[0].message.content.trim() });

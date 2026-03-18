@@ -444,6 +444,35 @@
       margin-top: 6px;
     }
 
+    /* Context banner */
+    .ctx-banner {
+      display: none;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 12px;
+      background: rgba(59,130,246,0.08);
+      border: 1px solid rgba(59,130,246,0.2);
+      border-radius: 8px;
+      margin-bottom: 8px;
+      font-size: 12px;
+      color: #93c5fd;
+    }
+
+    .ctx-banner.visible { display: flex; }
+
+    .ctx-banner-dismiss {
+      margin-left: auto;
+      background: none;
+      border: none;
+      color: var(--muted);
+      cursor: pointer;
+      font-size: 12px;
+      padding: 0 2px;
+      line-height: 1;
+    }
+
+    .ctx-banner-dismiss:hover { color: var(--text); }
+
     .error-bubble {
       background: rgba(239,68,68,0.08);
       border: 1px solid rgba(239,68,68,0.25);
@@ -585,6 +614,12 @@
 
     <div class="chat-box" id="chatBox"></div>
 
+    <div class="ctx-banner" id="ctxBanner">
+      <span>📊</span>
+      <span id="ctxBannerText">SQL context attached — ask me to analyze the data</span>
+      <button class="ctx-banner-dismiss" onclick="clearSqlContext()" title="Remove context">✕</button>
+    </div>
+
     <div class="chat-input-area">
       <textarea
         class="chat-input"
@@ -714,7 +749,10 @@
             <tbody>${tbody}</tbody>
           </table>
         </div>
-        <div class="result-meta">${rows.length} row${rows.length !== 1 ? 's' : ''} returned</div>`;
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-top:6px">
+          <span class="result-meta">${rows.length} row${rows.length !== 1 ? 's' : ''} returned</span>
+          <button class="btn btn-ghost" onclick="switchToAiMode()" style="font-size:11px;padding:4px 10px;gap:4px;">🤖 Analyze with AI</button>
+        </div>`;
     } else if (Array.isArray(rows) && rows.length === 0) {
       html += `<div class="result-meta">Query returned no rows.</div>`;
     } else if (rows && typeof rows.affectedRows === 'number') {
@@ -735,6 +773,12 @@
       </div>`;
     chatBox.appendChild(el);
     scrollBottom();
+
+    // Store result as context for AI chat
+    if (Array.isArray(data.data)) {
+      lastSqlContext = { sql: data.query_generated, rows: data.data };
+      updateContextBanner();
+    }
   }
 
   function appendAiResponse(text) {
@@ -767,6 +811,29 @@
     });
   }
 
+  // ── Conversation state ────────────────────────────────────────────────────
+  let chatHistory   = [];   // [{role:'user'|'assistant', content:string}]
+  let lastSqlContext = null; // {sql:string, rows:any[]}
+
+  function updateContextBanner() {
+    const banner = document.getElementById('ctxBanner');
+    if (currentMode === 'ai' && lastSqlContext) {
+      const preview = lastSqlContext.sql.length > 60
+        ? lastSqlContext.sql.slice(0, 60) + '…'
+        : lastSqlContext.sql;
+      document.getElementById('ctxBannerText').textContent =
+        `📊 SQL context: ${lastSqlContext.rows.length} rows from "${preview}"`;
+      banner.classList.add('visible');
+    } else {
+      banner.classList.remove('visible');
+    }
+  }
+
+  function clearSqlContext() {
+    lastSqlContext = null;
+    updateContextBanner();
+  }
+
   // ── Mode toggle ───────────────────────────────────────────────────────────
   let currentMode = 'mysql';
   const chatInput = document.getElementById('chatInput');
@@ -776,18 +843,33 @@
     document.getElementById('mysqlBtn').classList.add('active');
     document.getElementById('aiBtn').classList.remove('active');
     chatInput.placeholder = 'Ask anything about your database…';
+    updateContextBanner();
   });
 
   document.getElementById('aiBtn').addEventListener('click', () => {
     currentMode = 'ai';
     document.getElementById('aiBtn').classList.add('active');
     document.getElementById('mysqlBtn').classList.remove('active');
-    chatInput.placeholder = 'Ask the AI anything…';
+    chatInput.placeholder = lastSqlContext
+      ? 'Ask me to analyze the data, or anything else…'
+      : 'Ask the AI anything…';
+    updateContextBanner();
   });
+
+  function switchToAiMode() {
+    currentMode = 'ai';
+    document.getElementById('aiBtn').classList.add('active');
+    document.getElementById('mysqlBtn').classList.remove('active');
+    chatInput.placeholder = 'Ask me to analyze the data, or anything else…';
+    updateContextBanner();
+    chatInput.focus();
+  }
 
   // ── Clear chat ────────────────────────────────────────────────────────────
   document.getElementById('clearBtn').addEventListener('click', () => {
     document.getElementById('chatBox').innerHTML = '';
+    chatHistory = [];
+    updateContextBanner();
   });
 
   // ── Send message ──────────────────────────────────────────────────────────
@@ -802,7 +884,18 @@
     chatInput.style.height = 'auto';
     appendUserMessage(text);
 
-    const endpoint = currentMode === 'mysql' ? '/submit-query' : '/gpt-chat';
+    const mode = currentMode;
+    let endpoint, body;
+
+    if (mode === 'mysql') {
+      endpoint = '/submit-query';
+      body = { userInput: text };
+    } else {
+      endpoint = '/gpt-chat';
+      chatHistory.push({ role: 'user', content: text });
+      body = { messages: chatHistory, dataContext: lastSqlContext };
+    }
+
     const indicator = appendTypingIndicator();
     isLoading = true;
     setSendBtnLoading(true);
@@ -811,21 +904,24 @@
       const res = await fetch(endpoint, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ userInput: text }),
+        body: JSON.stringify(body),
       });
 
       const data = await res.json();
       indicator.remove();
 
       if (data.error) {
+        if (mode === 'ai') chatHistory.pop(); // undo failed message
         appendErrorMessage(data.error);
-      } else if (currentMode === 'mysql') {
+      } else if (mode === 'mysql') {
         appendSqlResponse(data);
       } else {
+        chatHistory.push({ role: 'assistant', content: data.response });
         appendAiResponse(data.response);
       }
     } catch (err) {
       indicator.remove();
+      if (mode === 'ai') chatHistory.pop();
       appendErrorMessage('Network error: ' + err.message);
     } finally {
       isLoading = false;
