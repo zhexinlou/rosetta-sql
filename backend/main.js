@@ -117,13 +117,16 @@ app.post('/configure-db', async (req, res) => {
     password: dbPassword ?? '',
   };
 
-  // Validate connection before accepting config
+  // Validate connection before accepting config (5 s timeout for fast failure)
   let testConn;
   try {
-    testConn = await mysql.createConnection(config);
+    testConn = await mysql.createConnection({ ...config, connectTimeout: 5000 });
     await testConn.end();
   } catch (err) {
-    return res.status(400).json({ success: false, error: err.message });
+    const msg = err.code === 'ETIMEDOUT'
+      ? `Connection timed out — check that ${config.host}:${config.port} is reachable and the port is correct.`
+      : err.message;
+    return res.status(400).json({ success: false, error: msg });
   }
 
   // Tear down existing pool if any
