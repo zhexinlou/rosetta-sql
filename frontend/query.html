@@ -774,9 +774,25 @@
     chatBox.appendChild(el);
     scrollBottom();
 
-    // Store result as context for AI chat
-    if (Array.isArray(data.data)) {
+    // Inject SQL result into chatHistory so AI Chat mode always has it in-context
+    if (Array.isArray(data.data) && data.data.length > 0) {
       lastSqlContext = { sql: data.query_generated, rows: data.data };
+
+      // Remove any previous SQL context markers from history to avoid stale data
+      const prevCtxIdx = chatHistory.findIndex(m => m._sqlCtx);
+      if (prevCtxIdx !== -1) chatHistory.splice(prevCtxIdx, 2); // remove marker + assistant pair
+
+      const dataStr = JSON.stringify(data.data.slice(0, 100), null, 2);
+      chatHistory.push({
+        _sqlCtx: true,
+        role: 'user',
+        content: `[SQL query result]\nQuery: \`${data.query_generated}\`\nRows (${data.data.length}):\n\`\`\`json\n${dataStr}\n\`\`\``,
+      });
+      chatHistory.push({
+        role: 'assistant',
+        content: `Got it — I can see the query returned ${data.data.length} row${data.data.length !== 1 ? 's' : ''}. Switch to AI Chat and ask me anything about this data.`,
+      });
+
       updateContextBanner();
     }
   }
@@ -893,7 +909,9 @@
     } else {
       endpoint = '/gpt-chat';
       chatHistory.push({ role: 'user', content: text });
-      body = { messages: chatHistory, dataContext: lastSqlContext };
+      // Strip client-only marker before sending; keep role+content only
+      const cleanHistory = chatHistory.map(({ role, content }) => ({ role, content }));
+      body = { messages: cleanHistory };
     }
 
     const indicator = appendTypingIndicator();
