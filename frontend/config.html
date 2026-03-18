@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Connect Database — Rosetta</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      background: linear-gradient(135deg, #0a0a12 0%, #0d1b2e 50%, #0a0a12 100%);
+      color: #e2e8f0;
+    }
+
+    nav {
+      position: fixed;
+      top: 0;
+      width: 100%;
+      padding: 0 48px;
+      height: 60px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: rgba(10, 10, 18, 0.85);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid rgba(255,255,255,0.07);
+      z-index: 100;
+    }
+
+    .nav-brand {
+      font-size: 18px;
+      font-weight: 700;
+      color: #60a5fa;
+    }
+
+    .nav-back {
+      color: #94a3b8;
+      text-decoration: none;
+      font-size: 14px;
+      font-weight: 500;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      transition: color 0.2s;
+    }
+
+    .nav-back:hover { color: #e2e8f0; }
+
+    .page {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 80px 24px 40px;
+    }
+
+    .card {
+      background: rgba(255,255,255,0.04);
+      border: 1px solid rgba(255,255,255,0.09);
+      border-radius: 16px;
+      padding: 44px 48px;
+      width: 100%;
+      max-width: 480px;
+      box-shadow: 0 24px 64px rgba(0,0,0,0.4);
+    }
+
+    .card-header { margin-bottom: 32px; }
+
+    .card-header h1 {
+      font-size: 24px;
+      font-weight: 700;
+      color: #f1f5f9;
+      margin-bottom: 6px;
+    }
+
+    .card-header p {
+      font-size: 14px;
+      color: #64748b;
+    }
+
+    .field {
+      margin-bottom: 16px;
+    }
+
+    .field label {
+      display: block;
+      font-size: 13px;
+      font-weight: 500;
+      color: #94a3b8;
+      margin-bottom: 6px;
+    }
+
+    .field input {
+      width: 100%;
+      padding: 11px 14px;
+      background: rgba(255,255,255,0.06);
+      border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 8px;
+      font-size: 14px;
+      font-family: inherit;
+      color: #e2e8f0;
+      outline: none;
+      transition: border-color 0.2s, background 0.2s;
+    }
+
+    .field input::placeholder { color: #475569; }
+
+    .field input:focus {
+      border-color: #3b82f6;
+      background: rgba(59, 130, 246, 0.05);
+    }
+
+    .row { display: flex; gap: 12px; }
+    .row .field { flex: 1; }
+    .row .field.port { flex: 0 0 110px; }
+
+    .submit-btn {
+      width: 100%;
+      margin-top: 24px;
+      padding: 13px;
+      background: linear-gradient(135deg, #1d4ed8, #3b82f6);
+      color: #fff;
+      border: none;
+      border-radius: 8px;
+      font-size: 15px;
+      font-weight: 600;
+      font-family: inherit;
+      cursor: pointer;
+      transition: transform 0.15s, box-shadow 0.15s, opacity 0.15s;
+      box-shadow: 0 4px 16px rgba(59, 130, 246, 0.3);
+    }
+
+    .submit-btn:hover:not(:disabled) {
+      transform: translateY(-1px);
+      box-shadow: 0 6px 20px rgba(59, 130, 246, 0.4);
+    }
+
+    .submit-btn:disabled { opacity: 0.6; cursor: not-allowed; }
+
+    .status {
+      margin-top: 16px;
+      padding: 12px 14px;
+      border-radius: 8px;
+      font-size: 14px;
+      display: none;
+    }
+
+    .status.error {
+      background: rgba(239, 68, 68, 0.1);
+      border: 1px solid rgba(239, 68, 68, 0.3);
+      color: #fca5a5;
+    }
+
+    .status.success {
+      background: rgba(34, 197, 94, 0.1);
+      border: 1px solid rgba(34, 197, 94, 0.3);
+      color: #86efac;
+    }
+
+    .spinner {
+      display: inline-block;
+      width: 16px;
+      height: 16px;
+      border: 2px solid rgba(255,255,255,0.3);
+      border-top-color: #fff;
+      border-radius: 50%;
+      animation: spin 0.7s linear infinite;
+      vertical-align: middle;
+      margin-right: 8px;
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+  </style>
+</head>
+<body>
+  <nav>
+    <span class="nav-brand">Rosetta</span>
+    <a class="nav-back" href="index.html">← Back</a>
+  </nav>
+
+  <div class="page">
+    <div class="card">
+      <div class="card-header">
+        <h1>Connect your database</h1>
+        <p>Enter your MySQL connection details to get started.</p>
+      </div>
+
+      <form id="configForm" novalidate>
+        <div class="row">
+          <div class="field">
+            <label for="dbHost">Host</label>
+            <input type="text" id="dbHost" placeholder="localhost" required>
+          </div>
+          <div class="field port">
+            <label for="dbPort">Port</label>
+            <input type="text" id="dbPort" placeholder="3306">
+          </div>
+        </div>
+
+        <div class="field">
+          <label for="dbName">Database name</label>
+          <input type="text" id="dbName" placeholder="my_database" required>
+        </div>
+
+        <div class="field">
+          <label for="dbUser">User</label>
+          <input type="text" id="dbUser" placeholder="root" required>
+        </div>
+
+        <div class="field">
+          <label for="dbPassword">Password</label>
+          <input type="password" id="dbPassword" placeholder="••••••••">
+        </div>
+
+        <button class="submit-btn" type="submit" id="submitBtn">Connect</button>
+      </form>
+
+      <div class="status" id="status"></div>
+    </div>
+  </div>
+
+  <script>
+    const form = document.getElementById('configForm');
+    const submitBtn = document.getElementById('submitBtn');
+    const statusEl = document.getElementById('status');
+
+    function showStatus(type, message) {
+      statusEl.className = `status ${type}`;
+      statusEl.textContent = message;
+      statusEl.style.display = 'block';
+    }
+
+    function setLoading(loading) {
+      submitBtn.disabled = loading;
+      submitBtn.innerHTML = loading
+        ? '<span class="spinner"></span>Connecting…'
+        : 'Connect';
+    }
+
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      statusEl.style.display = 'none';
+
+      const dbHost = document.getElementById('dbHost').value.trim();
+      const dbPort = document.getElementById('dbPort').value.trim() || '3306';
+      const dbName = document.getElementById('dbName').value.trim();
+      const dbUser = document.getElementById('dbUser').value.trim();
+      const dbPassword = document.getElementById('dbPassword').value;
+
+      if (!dbHost || !dbName || !dbUser) {
+        showStatus('error', 'Host, database name, and user are required.');
+        return;
+      }
+
+      setLoading(true);
+
+      try {
+        const res = await fetch('/configure-db', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ dbHost, dbPort, dbName, dbUser, dbPassword }),
+        });
+
+        const data = await res.json();
+
+        if (data.success) {
+          showStatus('success', `Connected to "${data.database}" successfully.`);
+          setTimeout(() => { window.location.href = 'query.html'; }, 900);
+        } else {
+          showStatus('error', data.error || 'Connection failed.');
+          setLoading(false);
+        }
+      } catch (err) {
+        showStatus('error', 'Network error: ' + err.message);
+        setLoading(false);
+      }
+    });
+  </script>
+</body>
+</html>
