@@ -6,7 +6,6 @@
 
 Rosetta translates natural language into SQL using GPT-4 Turbo, executes the query against your database, and presents the results as a clean data table — no SQL knowledge required.
 
-![Rosetta screenshot](https://github.com/user-attachments/assets/e650f4b2-e60d-4cf0-b95b-e5d1e37b6e2d)
 
 </div>
 
@@ -95,7 +94,7 @@ What was the average sale amount by month this year?
 ## Project structure
 
 ```
-queryai/
+rosetta-sql/
 ├── backend/
 │   ├── main.js          # Express server — API routes, DB pool, schema cache
 │   └── plot_stock.py    # Stock chart generation (matplotlib)
@@ -125,4 +124,4 @@ Pull requests are welcome. For substantial changes, please open an issue first t
 
 ## License
 
-[MIT](LICENSE)
+MIT — feel free to use, modify, and distribute.
